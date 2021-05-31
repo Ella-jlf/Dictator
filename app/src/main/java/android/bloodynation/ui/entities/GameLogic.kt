@@ -7,7 +7,7 @@ import kotlin.random.Random
 
 class GameLogic : ViewModel(){
     private val fractions = ArrayList<Fraction>(4)
-    val fractionsLiveData  = MutableLiveData<ArrayList<Fraction>>()
+    private val fractionsLiveData  = MutableLiveData<ArrayList<Fraction>>()
     private val min = 0
     private val max = 12
     private val startMin = 4
@@ -15,6 +15,13 @@ class GameLogic : ViewModel(){
     private val questions = ArrayList<Question>()
     var curQuestion = Question("Начать игру?")
 
+
+    fun getRawFractions(): ArrayList<Fraction>{
+        return fractions
+    }
+    fun getLiveDataFractions():LiveData<ArrayList<Fraction>>{
+        return fractionsLiveData
+    }
 
     fun initGame() {
         fillFractions()
@@ -79,18 +86,17 @@ class GameLogic : ViewModel(){
         )
     }
 
-    fun nextRound(answer:Boolean) {
+    //returns false if died
+    fun nextRound(answer:Boolean):Boolean {
         executeAnswer(curQuestion,answer)
         fractionsLiveData.value = fractions
-        if (isAlive()){
-            curQuestion = getQuestion()
-        }
+        curQuestion = getQuestion()
+        return isAlive()
     }
 
     private fun isAlive(): Boolean {
         for (i in fractions) {
             if (i.currentAttitude <= 0){
-                initGame()
                 return false}
         }
         return true
