@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "371282611119",
+    "project_id": "bloodynation-e7d50",
+    "storage_bucket": "bloodynation-e7d50.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:371282611119:android:f95cc9830a2812f6b0bd5a",
+        "android_client_info": {
+          "package_name": "android.ella_jlf.bloodynation"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "371282611119-tscca5ko4mml0b5bctegn36qtg2i8qif.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWEA9T0jllOtki5aFQpDQXySvK4cz7F50"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "371282611119-tscca5ko4mml0b5bctegn36qtg2i8qif.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
