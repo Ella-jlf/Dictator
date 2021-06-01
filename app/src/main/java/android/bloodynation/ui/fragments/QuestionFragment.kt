@@ -1,5 +1,7 @@
 package android.bloodynation.ui.fragments
 
+import android.annotation.SuppressLint
+import android.bloodynation.R
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -21,6 +23,7 @@ class QuestionFragment : Fragment(), View.OnClickListener {
     private var alive = false
 
 
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -35,6 +38,10 @@ class QuestionFragment : Fragment(), View.OnClickListener {
 
         mBinding.buttonYes.setOnClickListener(this)
         mBinding.buttonNo.setOnClickListener(this)
+
+        gameLogic.getScoreLiveData().observe(viewLifecycleOwner,{
+            mBinding.questionsScore.text = getString(R.string.score) + ":" + it.toString()
+        })
 
         if (!alive)
         gameLogic.initGame()
@@ -63,6 +70,8 @@ class QuestionFragment : Fragment(), View.OnClickListener {
         mBinding.listViewFractionAttitude.adapter!!.notifyDataSetChanged()
         if (!alive){
             Toast.makeText(requireContext(),"You Died",Toast.LENGTH_LONG).show()
+            val dialog = EndGameDialogFragment()
+            dialog.show(parentFragmentManager,null)
             gameLogic.initGame()
             mBinding.questionViewMain.text = gameLogic.curQuestion.question
         }

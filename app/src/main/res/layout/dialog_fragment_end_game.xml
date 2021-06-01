@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/dialog_view"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+
+    <ImageView
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:background="@drawable/service_girl"
+        android:scaleType="center"
+        />
+    <TextView
+        android:layout_width="300dp"
+        android:layout_height="100dp"
+        android:textSize="@dimen/text_size_32"
+        android:textAlignment="center"
+        android:text="@string/lose_phrase"
+        />
+
+</LinearLayout>

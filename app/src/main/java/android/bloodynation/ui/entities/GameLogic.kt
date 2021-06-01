@@ -10,6 +10,10 @@ class GameLogic : ViewModel(){
     private val fractionsLiveData  = MutableLiveData<ArrayList<Fraction>>()
     private val min = 0
     private val max = 12
+    private var score = 0
+    private val scoreLiveData = MutableLiveData<Int>().apply {
+        value = score
+    }
     private val startMin = 4
     private val startMax = 7
     private val questions = ArrayList<Question>()
@@ -22,8 +26,20 @@ class GameLogic : ViewModel(){
     fun getLiveDataFractions():LiveData<ArrayList<Fraction>>{
         return fractionsLiveData
     }
+    private fun addScore(count: Int){
+        score += count
+        scoreLiveData.value = score
+    }
+    fun getScoreLiveData():LiveData<Int>{
+        return scoreLiveData
+    }
+    private fun nullifyScore(){
+        score = 0
+        scoreLiveData.value = score
+    }
 
     fun initGame() {
+        nullifyScore()
         fillFractions()
         fillQuestions()
         curQuestion = Question("Начать игру?")
@@ -91,6 +107,7 @@ class GameLogic : ViewModel(){
         executeAnswer(curQuestion,answer)
         fractionsLiveData.value = fractions
         curQuestion = getQuestion()
+        addScore(1)
         return isAlive()
     }
 
@@ -112,6 +129,8 @@ class GameLogic : ViewModel(){
                 for (j in question.inflns) {
                     if (i.name == j.fraction_name) {
                         i.currentAttitude += j.yes
+                        if (i.currentAttitude > max)
+                            i.currentAttitude = max
                     }
                 }
             }
@@ -120,6 +139,8 @@ class GameLogic : ViewModel(){
                 for (j in question.inflns) {
                     if (i.name == j.fraction_name) {
                         i.currentAttitude += j.no
+                        if (i.currentAttitude > max)
+                            i.currentAttitude = max
                     }
                 }
             }

@@ -18,11 +18,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <ProgressBar
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:id="@+id/row_fraction_attitude"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="300dp"
+        android:layout_height="25dp"
         android:text="@string/attitude_value"
+        android:scaleY="4"
+        android:progressTint="@color/black"
+        android:secondaryProgress="7"
+        android:secondaryProgressTint="@color/dim_red"
+        android:max="12"
+        android:progress="5"
+
         app:layout_constraintStart_toStartOf="@+id/row_fraction_name"
         app:layout_constraintTop_toBottomOf="@+id/row_fraction_name" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

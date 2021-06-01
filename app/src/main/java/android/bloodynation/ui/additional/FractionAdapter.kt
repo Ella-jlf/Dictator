@@ -27,7 +27,7 @@ class FractionAdapter( fractionAttitude: ArrayList<Fraction>) :
     override fun onBindViewHolder(holder: FractionViewHolder, position: Int) {
         mFractionAttitude[position].also {
             holder.fractionName.text = it.name
-            holder.fractionAttitude.text = it.currentAttitude.toString()
+            holder.fractionAttitude.progress = it.currentAttitude
         }
     }
 
