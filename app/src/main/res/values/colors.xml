@@ -12,4 +12,7 @@
     <color name="blue_light">#3682F4</color>
     <color name="text_color">#000000</color>
     <color name="text_button_color">#000000</color>
+    <color name="radio_button_pressed">#59048D</color>
+    <color name="radio_button_checked">#413A6D</color>
+    <color name="dim_red">#A20000</color>
 </resources>

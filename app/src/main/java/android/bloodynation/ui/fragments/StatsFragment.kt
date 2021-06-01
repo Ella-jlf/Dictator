@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.bloodynation.databinding.FragmentStatsBinding
-import android.bloodynation.ui.views.FractionAdapter
 import android.widget.ListView
 
 class StatsFragment : Fragment() {

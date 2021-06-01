@@ -10,4 +10,8 @@
     <string name="answer_no">No</string>
     <string name="title_fraction">Fraction</string>
     <string name="attitude_value">Attitude value</string>
+    <string name="language">Language</string>
+    <string name="theme">Theme</string>
+    <string name="lose_phrase">Oops, seems that you died</string>
+    <string name="score">Score</string>
 </resources>
