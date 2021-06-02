@@ -1,5 +1,7 @@
 package android.bloodynation.ui.entities
 
+import android.bloodynation.ui.entities.database.Influence
+import android.bloodynation.ui.entities.database.Question
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,7 +19,7 @@ class GameLogic : ViewModel(){
     private val startMin = 4
     private val startMax = 7
     private val questions = ArrayList<Question>()
-    var curQuestion = Question("Начать игру?")
+    var curQuestion = Question(question = "Начать игру?")
 
 
     fun getRawFractions(): ArrayList<Fraction>{
@@ -42,7 +44,7 @@ class GameLogic : ViewModel(){
         nullifyScore()
         fillFractions()
         fillQuestions()
-        curQuestion = Question("Начать игру?")
+        curQuestion = Question(question = "Начать игру?")
     }
 
     private fun fillFractions() {
@@ -127,7 +129,7 @@ class GameLogic : ViewModel(){
         if (answer) {
             for (i in fractions) {
                 for (j in question.inflns) {
-                    if (i.name == j.fraction_name) {
+                    if (i.name == j.fractionName) {
                         i.currentAttitude += j.yes
                         if (i.currentAttitude > max)
                             i.currentAttitude = max
@@ -137,7 +139,7 @@ class GameLogic : ViewModel(){
         } else {
             for (i in fractions) {
                 for (j in question.inflns) {
-                    if (i.name == j.fraction_name) {
+                    if (i.name == j.fractionName) {
                         i.currentAttitude += j.no
                         if (i.currentAttitude > max)
                             i.currentAttitude = max

@@ -1,0 +1,31 @@
+package android.bloodynation.ui.entities.database
+
+import android.content.Context
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+
+@Database(entities = [(Influence::class), (Question::class)], version = 1)
+    abstract class DictatorDatabase : RoomDatabase() {
+
+        abstract fun questionDao(): QuestionDao
+
+        abstract fun influenceDao(): InfluenceDao
+
+        // singleton
+        companion object {
+            private var sInstance: DictatorDatabase? = null
+
+            @Synchronized
+            fun getInstance(context: Context): DictatorDatabase {
+                if (sInstance == null) {
+                    sInstance = Room
+                        .databaseBuilder(context.applicationContext, DictatorDatabase::class.java, "db_dictator")
+                        .fallbackToDestructiveMigration()
+                        .build()
+                }
+                return sInstance!!
+            }
+        }
+
+    }
