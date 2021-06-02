@@ -1,15 +1,20 @@
 package android.bloodynation.ui.entities
 
+import android.bloodynation.ui.entities.database.DictatorDatabase
 import android.bloodynation.ui.entities.database.Influence
 import android.bloodynation.ui.entities.database.Question
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 
-class GameLogic : ViewModel(){
+class GameLogic() : ViewModel() {
     private val fractions = ArrayList<Fraction>(4)
-    private val fractionsLiveData  = MutableLiveData<ArrayList<Fraction>>()
+    private val fractionsLiveData = MutableLiveData<ArrayList<Fraction>>()
     private val min = 0
     private val max = 12
     private var score = 0
@@ -18,24 +23,46 @@ class GameLogic : ViewModel(){
     }
     private val startMin = 4
     private val startMax = 7
-    private val questions = ArrayList<Question>()
+    private var questions = ArrayList<Question>()
     var curQuestion = Question(question = "Начать игру?")
 
+    //TODO:delete this
+    fun uploadToDb(context: Context) {
+        val questionDao = DictatorDatabase.getInstance(context).questionDao()
+        viewModelScope.launch(Dispatchers.IO) {
+            questionDao.deleteAll()
+            questionDao.insertAll(questions[0], questions[1], questions[2])
+        }
 
-    fun getRawFractions(): ArrayList<Fraction>{
+    }
+
+    // TODO: delete this
+    fun checkDb(context: Context) {
+        val questionDao = DictatorDatabase.getInstance(context).questionDao()
+        viewModelScope.launch(Dispatchers.IO) {
+            questions = questionDao.getAll() as ArrayList<Question>
+        }
+    }
+
+
+    fun getRawFractions(): ArrayList<Fraction> {
         return fractions
     }
-    fun getLiveDataFractions():LiveData<ArrayList<Fraction>>{
+
+    fun getLiveDataFractions(): LiveData<ArrayList<Fraction>> {
         return fractionsLiveData
     }
-    private fun addScore(count: Int){
+
+    private fun addScore(count: Int) {
         score += count
         scoreLiveData.value = score
     }
-    fun getScoreLiveData():LiveData<Int>{
+
+    fun getScoreLiveData(): LiveData<Int> {
         return scoreLiveData
     }
-    private fun nullifyScore(){
+
+    private fun nullifyScore() {
         score = 0
         scoreLiveData.value = score
     }
@@ -105,8 +132,8 @@ class GameLogic : ViewModel(){
     }
 
     //returns false if died
-    fun nextRound(answer:Boolean):Boolean {
-        executeAnswer(curQuestion,answer)
+    fun nextRound(answer: Boolean): Boolean {
+        executeAnswer(curQuestion, answer)
         fractionsLiveData.value = fractions
         curQuestion = getQuestion()
         addScore(1)
@@ -115,8 +142,9 @@ class GameLogic : ViewModel(){
 
     private fun isAlive(): Boolean {
         for (i in fractions) {
-            if (i.currentAttitude <= 0){
-                return false}
+            if (i.currentAttitude <= 0) {
+                return false
+            }
         }
         return true
     }

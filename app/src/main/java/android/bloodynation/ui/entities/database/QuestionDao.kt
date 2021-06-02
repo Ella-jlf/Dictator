@@ -15,6 +15,9 @@ interface QuestionDao {
     @Insert
     fun insertAll(vararg question: Question)
 
+    @Query("DELETE FROM questions")
+    fun deleteAll()
+
     @Delete
     fun delete(question: Question)
 }

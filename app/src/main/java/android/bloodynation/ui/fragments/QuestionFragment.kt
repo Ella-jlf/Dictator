@@ -15,6 +15,9 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
 
 class QuestionFragment : Fragment(), View.OnClickListener {
@@ -39,16 +42,17 @@ class QuestionFragment : Fragment(), View.OnClickListener {
         mBinding.buttonYes.setOnClickListener(this)
         mBinding.buttonNo.setOnClickListener(this)
 
-        gameLogic.getScoreLiveData().observe(viewLifecycleOwner,{
+        gameLogic.getScoreLiveData().observe(viewLifecycleOwner, {
             mBinding.questionsScore.text = getString(R.string.score) + ":" + it.toString()
         })
 
-        if (!alive)
-        gameLogic.initGame()
-
+        if (!alive) {
+            gameLogic.initGame()
+            gameLogic.uploadToDb(requireContext())
+            gameLogic.checkDb(requireContext())
+        }
         return mBinding.root
     }
-
 
 
     override fun onStart() {
@@ -68,10 +72,10 @@ class QuestionFragment : Fragment(), View.OnClickListener {
         }
         mBinding.questionViewMain.text = gameLogic.curQuestion.question
         mBinding.listViewFractionAttitude.adapter!!.notifyDataSetChanged()
-        if (!alive){
-            Toast.makeText(requireContext(),"You Died",Toast.LENGTH_LONG).show()
+        if (!alive) {
+            Toast.makeText(requireContext(), "You Died", Toast.LENGTH_LONG).show()
             val dialog = EndGameDialogFragment()
-            dialog.show(parentFragmentManager,null)
+            dialog.show(parentFragmentManager, null)
             gameLogic.initGame()
             mBinding.questionViewMain.text = gameLogic.curQuestion.question
         }

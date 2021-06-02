@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [(Influence::class), (Question::class)], version = 1)
+@Database(entities = [(Influence::class), (Question::class)], version = 1,exportSchema = false)
     abstract class DictatorDatabase : RoomDatabase() {
 
         abstract fun questionDao(): QuestionDao
@@ -21,7 +21,6 @@ import androidx.room.RoomDatabase
                 if (sInstance == null) {
                     sInstance = Room
                         .databaseBuilder(context.applicationContext, DictatorDatabase::class.java, "db_dictator")
-                        .fallbackToDestructiveMigration()
                         .build()
                 }
                 return sInstance!!
