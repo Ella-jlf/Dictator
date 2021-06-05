@@ -6,7 +6,7 @@ import androidx.room.*
 @Entity(tableName = "influences")
 data class Influence(
     @PrimaryKey(autoGenerate = true)
-    val uid:Int = 0,
+    val influenceId:Int = 0,
     @ColumnInfo(name ="fractionName")
     val fractionName: String,
     @ColumnInfo(name = "yes")

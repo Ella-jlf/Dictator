@@ -1,48 +1,89 @@
 package android.bloodynation.ui.entities
 
-import android.bloodynation.ui.entities.database.DictatorDatabase
-import android.bloodynation.ui.entities.database.Influence
-import android.bloodynation.ui.entities.database.Question
+import android.bloodynation.ui.entities.database.*
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 class GameLogic() : ViewModel() {
+
+    inner class DatabaseManager(_context: Context){
+
+        private val influenceDao: InfluenceDao
+        private val questionDao: QuestionDao
+        private val crossRefDao: QuestionsInfluencesCrossRefDao
+        init {
+            DictatorDatabase.getInstance(_context).also {
+                influenceDao = it.influenceDao()
+                questionDao = it.questionDao()
+                crossRefDao = it.questionsInfluencesCrossRef()
+            }
+        }
+
+        fun clearAll(){
+            influenceDao.deleteAll()
+            questionDao.deleteAll()
+        }
+
+        fun uploadQuestions(){
+            for (i in questions)
+                crossRefDao.insert(i)
+        }
+        fun uploadInfluences(){
+            for (i in questions)
+                for (j in i.inflns)
+                    influenceDao.insertAll(j)
+        }
+
+    }
+
+
+
+
+    // subordinate parts of kingdom
     private val fractions = ArrayList<Fraction>(4)
     private val fractionsLiveData = MutableLiveData<ArrayList<Fraction>>()
-    private val min = 0
-    private val max = 12
+
+    private var questions = ArrayList<QuestionsWithInfluences>()
+
     private var score = 0
     private val scoreLiveData = MutableLiveData<Int>().apply {
         value = score
     }
+
+    private var curQuestion = QuestionsWithInfluences(Question(question = "Начать игру?"))
+    private val curQuestionLiveData: MutableLiveData<QuestionsWithInfluences> by lazy {
+        MutableLiveData<QuestionsWithInfluences>().apply {
+            value = curQuestion
+        }
+    }
+    private var alive = false
+    private val aliveLiveData = MutableLiveData<Boolean>().apply{
+        value = alive
+    }
+
+
+    private val min = 0
+    private val max = 12
+
     private val startMin = 4
     private val startMax = 7
-    private var questions = ArrayList<Question>()
-    var curQuestion = Question(question = "Начать игру?")
 
-    //TODO:delete this
-    fun uploadToDb(context: Context) {
-        val questionDao = DictatorDatabase.getInstance(context).questionDao()
-        viewModelScope.launch(Dispatchers.IO) {
-            questionDao.deleteAll()
-            questionDao.insertAll(questions[0], questions[1], questions[2])
-        }
 
+    fun getDatabaseManager(context: Context): DatabaseManager {
+        return DatabaseManager(context)
     }
 
-    // TODO: delete this
-    fun checkDb(context: Context) {
-        val questionDao = DictatorDatabase.getInstance(context).questionDao()
-        viewModelScope.launch(Dispatchers.IO) {
-            questions = questionDao.getAll() as ArrayList<Question>
-        }
+    fun getAliveLiveData():LiveData<Boolean>{
+        return aliveLiveData
     }
+
+    fun getCurQuestionLiveData(): LiveData<QuestionsWithInfluences> {
+        return curQuestionLiveData
+    }
+
 
 
     fun getRawFractions(): ArrayList<Fraction> {
@@ -67,11 +108,16 @@ class GameLogic() : ViewModel() {
         scoreLiveData.value = score
     }
 
+    private fun updateQuestion(q: QuestionsWithInfluences) {
+        curQuestion = q
+        curQuestionLiveData.value = curQuestion
+    }
+
     fun initGame() {
         nullifyScore()
         fillFractions()
         fillQuestions()
-        curQuestion = Question(question = "Начать игру?")
+        updateQuestion(QuestionsWithInfluences(Question("Начать игру?")))
     }
 
     private fun fillFractions() {
@@ -85,44 +131,116 @@ class GameLogic() : ViewModel() {
 
     private fun fillQuestions() {
         questions.clear()
-        questions.add(Question("Дать пизды церкви?"))
-        questions[0].addInfluence(Influence("Народ", Random.nextInt(-2, 3), Random.nextInt(-2, 3)))
-        questions[0].addInfluence(Influence("Армия", Random.nextInt(-2, 3), Random.nextInt(-2, 3)))
-        questions[0].addInfluence(Influence("Элита", Random.nextInt(-2, 3), Random.nextInt(-2, 3)))
-        questions[0].addInfluence(
+        questions.add(QuestionsWithInfluences(Question("Дать пизды церкви?")))
+        questions[0].registerInfluence(
+            Influence(
+                "Народ",
+                Random.nextInt(-2, 3),
+                Random.nextInt(-2, 3)
+            )
+        )
+        questions[0].registerInfluence(
+            Influence(
+                "Армия",
+                Random.nextInt(-2, 3),
+                Random.nextInt(-2, 3)
+            )
+        )
+        questions[0].registerInfluence(
+            Influence(
+                "Элита",
+                Random.nextInt(-2, 3),
+                Random.nextInt(-2, 3)
+            )
+        )
+        questions[0].registerInfluence(
             Influence(
                 "Церковь",
                 Random.nextInt(-2, 3),
                 Random.nextInt(-2, 3)
             )
         )
-        questions.add(Question("Дать пизды элите?"))
-        questions[1].addInfluence(Influence("Народ", Random.nextInt(-2, 3), Random.nextInt(-2, 3)))
-        questions[1].addInfluence(Influence("Армия", Random.nextInt(-2, 3), Random.nextInt(-2, 3)))
-        questions[1].addInfluence(Influence("Элита", Random.nextInt(-2, 3), Random.nextInt(-2, 3)))
-        questions[1].addInfluence(
+        questions.add(QuestionsWithInfluences(Question("Дать пизды элите?")))
+        questions[1].registerInfluence(
+            Influence(
+                "Народ",
+                Random.nextInt(-2, 3),
+                Random.nextInt(-2, 3)
+            )
+        )
+        questions[1].registerInfluence(
+            Influence(
+                "Армия",
+                Random.nextInt(-2, 3),
+                Random.nextInt(-2, 3)
+            )
+        )
+        questions[1].registerInfluence(
+            Influence(
+                "Элита",
+                Random.nextInt(-2, 3),
+                Random.nextInt(-2, 3)
+            )
+        )
+        questions[1].registerInfluence(
             Influence(
                 "Церковь",
                 Random.nextInt(-2, 3),
                 Random.nextInt(-2, 3)
             )
         )
-        questions.add(Question("Поднять налог?"))
-        questions[2].addInfluence(Influence("Народ", Random.nextInt(-2, 3), Random.nextInt(-2, 3)))
-        questions[2].addInfluence(Influence("Армия", Random.nextInt(-2, 3), Random.nextInt(-2, 3)))
-        questions[2].addInfluence(Influence("Элита", Random.nextInt(-2, 3), Random.nextInt(-2, 3)))
-        questions[2].addInfluence(
+        questions.add(QuestionsWithInfluences(Question("Поднять налог?")))
+        questions[2].registerInfluence(
+            Influence(
+                "Народ",
+                Random.nextInt(-2, 3),
+                Random.nextInt(-2, 3)
+            )
+        )
+        questions[2].registerInfluence(
+            Influence(
+                "Армия",
+                Random.nextInt(-2, 3),
+                Random.nextInt(-2, 3)
+            )
+        )
+        questions[2].registerInfluence(
+            Influence(
+                "Элита",
+                Random.nextInt(-2, 3),
+                Random.nextInt(-2, 3)
+            )
+        )
+        questions[2].registerInfluence(
             Influence(
                 "Церковь",
                 Random.nextInt(-2, 3),
                 Random.nextInt(-2, 3)
             )
         )
-        questions.add(Question("Провести праздник города?"))
-        questions[3].addInfluence(Influence("Народ", Random.nextInt(-2, 3), Random.nextInt(-2, 3)))
-        questions[3].addInfluence(Influence("Армия", Random.nextInt(-2, 3), Random.nextInt(-2, 3)))
-        questions[3].addInfluence(Influence("Элита", Random.nextInt(-2, 3), Random.nextInt(-2, 3)))
-        questions[3].addInfluence(
+        questions.add(QuestionsWithInfluences(Question("Провести праздник города?")))
+        questions[3].registerInfluence(
+            Influence(
+                "Народ",
+                Random.nextInt(-2, 3),
+                Random.nextInt(-2, 3)
+            )
+        )
+        questions[3].registerInfluence(
+            Influence(
+                "Армия",
+                Random.nextInt(-2, 3),
+                Random.nextInt(-2, 3)
+            )
+        )
+        questions[3].registerInfluence(
+            Influence(
+                "Элита",
+                Random.nextInt(-2, 3),
+                Random.nextInt(-2, 3)
+            )
+        )
+        questions[3].registerInfluence(
             Influence(
                 "Церковь",
                 Random.nextInt(-2, 3),
@@ -131,13 +249,13 @@ class GameLogic() : ViewModel() {
         )
     }
 
-    //returns false if died
-    fun nextRound(answer: Boolean): Boolean {
+    fun nextRound(answer: Boolean) {
         executeAnswer(curQuestion, answer)
         fractionsLiveData.value = fractions
-        curQuestion = getQuestion()
+        updateQuestion(getQuestion())
         addScore(1)
-        return isAlive()
+        alive = isAlive()
+        aliveLiveData.value = alive
     }
 
     private fun isAlive(): Boolean {
@@ -149,11 +267,11 @@ class GameLogic() : ViewModel() {
         return true
     }
 
-    private fun getQuestion(): Question {
+    private fun getQuestion(): QuestionsWithInfluences {
         return questions.random()
     }
 
-    private fun executeAnswer(question: Question, answer: Boolean) {
+    private fun executeAnswer(question: QuestionsWithInfluences, answer: Boolean) {
         if (answer) {
             for (i in fractions) {
                 for (j in question.inflns) {

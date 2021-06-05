@@ -9,7 +9,7 @@ interface QuestionDao {
     @Query("SELECT * FROM questions")
     fun getAll(): List<Question>
 
-    @Query("SELECT * FROM questions WHERE uid IN (:questionIds)")
+    @Query("SELECT * FROM questions WHERE questionId IN (:questionIds)")
     fun loadAllByIds(questionIds: IntArray): List<Question>
 
     @Insert
@@ -20,4 +20,9 @@ interface QuestionDao {
 
     @Delete
     fun delete(question: Question)
+
+    @Transaction
+    @Query("SELECT * FROM questions")
+    fun getQuestionsWithInfluences(): List<QuestionsWithInfluences>
+
 }

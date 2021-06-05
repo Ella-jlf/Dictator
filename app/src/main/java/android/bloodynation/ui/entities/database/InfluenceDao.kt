@@ -10,8 +10,11 @@ interface InfluenceDao {
     @Query("SELECT * FROM influences")
     fun getAll(): List<Influence>
 
-    @Query("SELECT * FROM influences WHERE uid IN (:influenceIds)")
+    @Query("SELECT * FROM influences WHERE influenceId IN (:influenceIds)")
     fun loadAllByIds(influenceIds: IntArray): List<Influence>
+
+    @Query("DELETE FROM influences")
+    fun deleteAll()
 
     @Insert
     fun insertAll(vararg influence: Influence)

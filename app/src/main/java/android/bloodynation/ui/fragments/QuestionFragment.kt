@@ -12,18 +12,19 @@ import android.bloodynation.ui.entities.GameLogic
 import android.bloodynation.ui.additional.FractionAdapter
 import android.widget.GridLayout
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 
 class QuestionFragment : Fragment(), View.OnClickListener {
     lateinit var mBinding: FragmentQuestionBinding
-    private val gameLogic: GameLogic by viewModels()
-    private var alive = false
+    private val gameLogic: GameLogic by activityViewModels()
 
 
     @SuppressLint("SetTextI18n")
@@ -42,42 +43,46 @@ class QuestionFragment : Fragment(), View.OnClickListener {
         mBinding.buttonYes.setOnClickListener(this)
         mBinding.buttonNo.setOnClickListener(this)
 
+
+        gameLogic.getCurQuestionLiveData().observe(viewLifecycleOwner, {
+            mBinding.questionViewMain.text = it.questionInstance.question
+        })
+
         gameLogic.getScoreLiveData().observe(viewLifecycleOwner, {
             mBinding.questionsScore.text = getString(R.string.score) + ":" + it.toString()
         })
 
-        if (!alive) {
-            gameLogic.initGame()
-            gameLogic.uploadToDb(requireContext())
-            gameLogic.checkDb(requireContext())
+        gameLogic.getAliveLiveData().observe(viewLifecycleOwner, {
+            if (!it) {
+                if (gameLogic.getScoreLiveData().value != 0) {
+                    val dialog = EndGameDialogFragment()
+                    dialog.show(parentFragmentManager, null)
+                }
+                gameLogic.initGame()
+            }
+        })
+
+        //TODO: Delete
+        val dbManager = gameLogic.getDatabaseManager(requireContext())
+        CoroutineScope(Dispatchers.IO).launch {
+            dbManager.clearAll()
+            dbManager.uploadQuestions()
+            dbManager.uploadInfluences()
         }
+
         return mBinding.root
-    }
-
-
-    override fun onStart() {
-        super.onStart()
-        mBinding.questionViewMain.text = gameLogic.curQuestion.question
     }
 
 
     override fun onClick(v: View?) {
         when (v) {
             mBinding.buttonYes -> {
-                alive = gameLogic.nextRound(true)
+                gameLogic.nextRound(true)
             }
             mBinding.buttonNo -> {
-                alive = gameLogic.nextRound(false)
+                gameLogic.nextRound(false)
             }
         }
-        mBinding.questionViewMain.text = gameLogic.curQuestion.question
         mBinding.listViewFractionAttitude.adapter!!.notifyDataSetChanged()
-        if (!alive) {
-            Toast.makeText(requireContext(), "You Died", Toast.LENGTH_LONG).show()
-            val dialog = EndGameDialogFragment()
-            dialog.show(parentFragmentManager, null)
-            gameLogic.initGame()
-            mBinding.questionViewMain.text = gameLogic.curQuestion.question
-        }
     }
 }

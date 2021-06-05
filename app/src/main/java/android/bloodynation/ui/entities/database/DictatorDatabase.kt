@@ -12,6 +12,8 @@ import androidx.room.RoomDatabase
 
         abstract fun influenceDao(): InfluenceDao
 
+        abstract fun questionsInfluencesCrossRef(): QuestionsInfluencesCrossRefDao
+
         // singleton
         companion object {
             private var sInstance: DictatorDatabase? = null

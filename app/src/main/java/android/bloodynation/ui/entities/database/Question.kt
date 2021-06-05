@@ -7,18 +7,34 @@ import androidx.room.*
 )
 class Question(
     @PrimaryKey(autoGenerate = true)
-    var uid: Int = 0,
+    var questionId: Int = 0,
     @ColumnInfo(name = "question")
-    var question: String? = null,
-    @Ignore
-    val inflns: ArrayList<Influence> = ArrayList(),
+    var question: String? = null
+) {
+    constructor(_question: String) : this(0, _question)
+}
+
+
+class QuestionsWithInfluences(
+    @Embedded val questionInstance: Question,
+    @Relation(
+        parentColumn = "questionId",
+        entity = Influence::class,
+        entityColumn = "influenceId",
+        associateBy = Junction(
+            QuestionsInfluencesCrossRef::class,
+            parentColumn = "questionId",
+            entityColumn = "influenceId"
+        )
+    )
+    val inflns: ArrayList<Influence>
 ) {
 
-    constructor(_question:String): this(0,_question)
+    constructor(questionInstance: Question) : this(questionInstance, ArrayList<Influence>())
 
-
-    fun addInfluence(influence: Influence) {
-        inflns.add(influence)
+    fun registerInfluence(vararg influence: Influence) {
+        for (i in influence) {
+            inflns.add(i)
+        }
     }
-
 }
