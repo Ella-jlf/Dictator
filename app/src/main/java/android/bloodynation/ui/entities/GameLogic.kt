@@ -13,29 +13,33 @@ class GameLogic() : ViewModel() {
 
         private val influenceDao: InfluenceDao
         private val questionDao: QuestionDao
-        private val crossRefDao: QuestionsInfluencesCrossRefDao
+        private val questionWithInfluencesDao: QuestionWithInfluencesDao
         init {
             DictatorDatabase.getInstance(_context).also {
                 influenceDao = it.influenceDao()
                 questionDao = it.questionDao()
-                crossRefDao = it.questionsInfluencesCrossRef()
+                questionWithInfluencesDao = it.questionWithInfluencesDao()
             }
         }
 
+
+        //TODO: DELETE
         fun clearAll(){
-            influenceDao.deleteAll()
-            questionDao.deleteAll()
+            //influenceDao.deleteAll()
+            //questionDao.deleteAll()
+            questionWithInfluencesDao.deleteQuestions()
+            questionWithInfluencesDao.deleteInfluences()
         }
 
         fun uploadQuestions(){
-            for (i in questions)
-                crossRefDao.insert(i)
+            questionWithInfluencesDao.insert(questions)
         }
-        fun uploadInfluences(){
-            for (i in questions)
-                for (j in i.inflns)
-                    influenceDao.insertAll(j)
+
+
+        fun getQuestions() {
+            questions =  questionWithInfluencesDao.getQuestionsWithInfluences() as ArrayList<QuestionWithInfluences>
         }
+
 
     }
 
@@ -46,16 +50,16 @@ class GameLogic() : ViewModel() {
     private val fractions = ArrayList<Fraction>(4)
     private val fractionsLiveData = MutableLiveData<ArrayList<Fraction>>()
 
-    private var questions = ArrayList<QuestionsWithInfluences>()
+    private var questions = ArrayList<QuestionWithInfluences>()
 
     private var score = 0
     private val scoreLiveData = MutableLiveData<Int>().apply {
         value = score
     }
 
-    private var curQuestion = QuestionsWithInfluences(Question(question = "Начать игру?"))
-    private val curQuestionLiveData: MutableLiveData<QuestionsWithInfluences> by lazy {
-        MutableLiveData<QuestionsWithInfluences>().apply {
+    private var curQuestion = QuestionWithInfluences(Question(question = "Начать игру?"))
+    private val curQuestionLiveData: MutableLiveData<QuestionWithInfluences> by lazy {
+        MutableLiveData<QuestionWithInfluences>().apply {
             value = curQuestion
         }
     }
@@ -80,11 +84,9 @@ class GameLogic() : ViewModel() {
         return aliveLiveData
     }
 
-    fun getCurQuestionLiveData(): LiveData<QuestionsWithInfluences> {
+    fun getCurQuestionLiveData(): LiveData<QuestionWithInfluences> {
         return curQuestionLiveData
     }
-
-
 
     fun getRawFractions(): ArrayList<Fraction> {
         return fractions
@@ -108,7 +110,7 @@ class GameLogic() : ViewModel() {
         scoreLiveData.value = score
     }
 
-    private fun updateQuestion(q: QuestionsWithInfluences) {
+    private fun updateQuestion(q: QuestionWithInfluences) {
         curQuestion = q
         curQuestionLiveData.value = curQuestion
     }
@@ -117,7 +119,7 @@ class GameLogic() : ViewModel() {
         nullifyScore()
         fillFractions()
         fillQuestions()
-        updateQuestion(QuestionsWithInfluences(Question("Начать игру?")))
+        updateQuestion(QuestionWithInfluences(Question("Начать игру?")))
     }
 
     private fun fillFractions() {
@@ -131,7 +133,7 @@ class GameLogic() : ViewModel() {
 
     private fun fillQuestions() {
         questions.clear()
-        questions.add(QuestionsWithInfluences(Question("Дать пизды церкви?")))
+        questions.add(QuestionWithInfluences(Question("Дать пизды церкви?")))
         questions[0].registerInfluence(
             Influence(
                 "Народ",
@@ -160,7 +162,7 @@ class GameLogic() : ViewModel() {
                 Random.nextInt(-2, 3)
             )
         )
-        questions.add(QuestionsWithInfluences(Question("Дать пизды элите?")))
+        questions.add(QuestionWithInfluences(Question("Дать пизды элите?")))
         questions[1].registerInfluence(
             Influence(
                 "Народ",
@@ -189,7 +191,7 @@ class GameLogic() : ViewModel() {
                 Random.nextInt(-2, 3)
             )
         )
-        questions.add(QuestionsWithInfluences(Question("Поднять налог?")))
+        questions.add(QuestionWithInfluences(Question("Поднять налог?")))
         questions[2].registerInfluence(
             Influence(
                 "Народ",
@@ -218,7 +220,7 @@ class GameLogic() : ViewModel() {
                 Random.nextInt(-2, 3)
             )
         )
-        questions.add(QuestionsWithInfluences(Question("Провести праздник города?")))
+        questions.add(QuestionWithInfluences(Question("Провести праздник города?")))
         questions[3].registerInfluence(
             Influence(
                 "Народ",
@@ -267,11 +269,11 @@ class GameLogic() : ViewModel() {
         return true
     }
 
-    private fun getQuestion(): QuestionsWithInfluences {
+    private fun getQuestion(): QuestionWithInfluences {
         return questions.random()
     }
 
-    private fun executeAnswer(question: QuestionsWithInfluences, answer: Boolean) {
+    private fun executeAnswer(question: QuestionWithInfluences, answer: Boolean) {
         if (answer) {
             for (i in fractions) {
                 for (j in question.inflns) {

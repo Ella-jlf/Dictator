@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.bloodynation.databinding.FragmentQuestionBinding
 import android.bloodynation.ui.entities.GameLogic
 import android.bloodynation.ui.additional.FractionAdapter
+import android.util.Log
 import android.widget.GridLayout
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
@@ -65,9 +66,7 @@ class QuestionFragment : Fragment(), View.OnClickListener {
         //TODO: Delete
         val dbManager = gameLogic.getDatabaseManager(requireContext())
         CoroutineScope(Dispatchers.IO).launch {
-            dbManager.clearAll()
-            dbManager.uploadQuestions()
-            dbManager.uploadInfluences()
+            //dbManager.getQuestions()
         }
 
         return mBinding.root

@@ -21,8 +21,5 @@ interface QuestionDao {
     @Delete
     fun delete(question: Question)
 
-    @Transaction
-    @Query("SELECT * FROM questions")
-    fun getQuestionsWithInfluences(): List<QuestionsWithInfluences>
 
 }

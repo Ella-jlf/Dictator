@@ -12,7 +12,7 @@ import androidx.room.RoomDatabase
 
         abstract fun influenceDao(): InfluenceDao
 
-        abstract fun questionsInfluencesCrossRef(): QuestionsInfluencesCrossRefDao
+        abstract fun questionWithInfluencesDao(): QuestionWithInfluencesDao
 
         // singleton
         companion object {

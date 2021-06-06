@@ -13,28 +13,3 @@ class Question(
 ) {
     constructor(_question: String) : this(0, _question)
 }
-
-
-class QuestionsWithInfluences(
-    @Embedded val questionInstance: Question,
-    @Relation(
-        parentColumn = "questionId",
-        entity = Influence::class,
-        entityColumn = "influenceId",
-        associateBy = Junction(
-            QuestionsInfluencesCrossRef::class,
-            parentColumn = "questionId",
-            entityColumn = "influenceId"
-        )
-    )
-    val inflns: ArrayList<Influence>
-) {
-
-    constructor(questionInstance: Question) : this(questionInstance, ArrayList<Influence>())
-
-    fun registerInfluence(vararg influence: Influence) {
-        for (i in influence) {
-            inflns.add(i)
-        }
-    }
-}
